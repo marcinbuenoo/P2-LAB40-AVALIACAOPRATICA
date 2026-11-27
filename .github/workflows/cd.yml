@@ -1,0 +1,40 @@
+name: CD simulado
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package-delivery:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Construir imagem de entrega
+        run: docker build --pull -t lab40:${{ github.sha }} .
+
+      - name: Exportar imagem
+        run: docker save lab40:${{ github.sha }} -o lab40-image.tar
+
+      - name: Criar registro de entrega
+        run: |
+          {
+            echo "repository=${{ github.repository }}"
+            echo "ref=${{ github.ref }}"
+            echo "sha=${{ github.sha }}"
+            echo "image=lab40:${{ github.sha }}"
+          } > deployment-record.txt
+
+      - name: Publicar artefato de entrega
+        uses: actions/upload-artifact@v4
+        with:
+          name: lab40-delivery-record
+          path: |
+            lab40-image.tar
+            deployment-record.txt
+          retention-days: 14

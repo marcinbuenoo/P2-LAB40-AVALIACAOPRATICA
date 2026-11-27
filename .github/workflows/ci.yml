@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Verificar formatação
+        run: npm run format:check
+
+      - name: Executar lint
+        run: npm run lint
+
+      - name: Executar testes automatizados
+        run: npm test
+
+      - name: Executar smoke test HTTP
+        run: npm run test:smoke
+
+      - name: Auditar dependências
+        run: npm run audit
+
+      - name: Construir imagem Docker
+        run: docker build --pull -t lab40:${{ github.sha }} .
+
+      - name: Verificar container Docker
+        run: |
+          docker run -d --name lab40-ci -p 3000:3000 lab40:${{ github.sha }}
+          trap 'docker logs lab40-ci; docker rm -f lab40-ci' EXIT
+          for attempt in {1..20}; do
+            curl --fail --silent http://127.0.0.1:3000/health && break
+            sleep 1
+          done
+          curl --fail --silent --show-error -X POST http://127.0.0.1:3000/api/features/14 \
+            -H 'Content-Type: application/json' \
+            --data '{"texto":"A sacada da casa"}'
+
+      - name: Exportar imagem Docker
+        run: docker save lab40:${{ github.sha }} -o lab40-image.tar
+
+      - name: Armazenar imagem como artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: lab40-image-${{ github.sha }}
+          path: lab40-image.tar
+          retention-days: 7
