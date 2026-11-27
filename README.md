@@ -76,7 +76,9 @@ A Feature 14 remove acentos, espaços, pontuação e diferenças entre maiúscul
 
 ## CI e Docker
 
-O workflow [ci.yml](.github/workflows/ci.yml) é acionado em `push` e `pull_request`. Ele instala dependências com `npm ci`, verifica formatação e lint, executa testes, smoke test, auditoria e constrói/testa a imagem Docker.
+O workflow [ci.yml](.github/workflows/ci.yml) é acionado em `push` e `pull_request`. Ele instala dependências com `npm ci`, verifica formatação e lint, executa testes, smoke test, auditoria, constrói/testa a imagem Docker e disponibiliza a imagem `.tar` como artefato.
+
+O workflow [cd.yml](.github/workflows/cd.yml) é um CD simulado, acionado em `main` ou manualmente. Ele publica o artefato `lab40-delivery-record`, contendo a imagem Docker e `deployment-record.txt` com repositório, referência, SHA e tag da imagem.
 
 Para validar localmente a imagem:
 

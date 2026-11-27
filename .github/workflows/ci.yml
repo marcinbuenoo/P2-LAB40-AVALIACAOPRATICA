@@ -52,3 +52,13 @@ jobs:
           curl --fail --silent --show-error -X POST http://127.0.0.1:3000/api/features/14 \
             -H 'Content-Type: application/json' \
             --data '{"texto":"A sacada da casa"}'
+
+      - name: Exportar imagem Docker
+        run: docker save lab40:${{ github.sha }} -o lab40-image.tar
+
+      - name: Armazenar imagem como artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: lab40-image-${{ github.sha }}
+          path: lab40-image.tar
+          retention-days: 7
