@@ -17,6 +17,10 @@ test("ignora pontuação e acentos", () => {
   assert.deepEqual(feature.execute({ texto: "Árá" }), { palindromo: true });
 });
 
+test("aceita o limite mínimo: um único caractere alfanumérico", () => {
+  assert.deepEqual(feature.execute({ texto: "a" }), { palindromo: true });
+});
+
 test("identifica texto que não é palíndromo", () => {
   assert.deepEqual(feature.execute({ texto: "FATEC" }), { palindromo: false });
 });
