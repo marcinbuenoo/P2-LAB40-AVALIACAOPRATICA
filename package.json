@@ -6,9 +6,19 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "node --watch src/server.js"
+    "dev": "node --watch src/server.js",
+    "test": "node --test",
+    "test:spec": "node --test --test-reporter=spec",
+    "lint": "eslint .",
+    "format:check": "prettier --check src/features/feature14.js test scripts eslint.config.js .github/workflows/ci.yml",
+    "test:smoke": "node scripts/smoke.js",
+    "audit": "npm audit --audit-level=high"
   },
   "engines": {
     "node": ">=20"
+  },
+  "devDependencies": {
+    "eslint": "^10.16.0",
+    "prettier": "^3.10.1"
   }
 }
